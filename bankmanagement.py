@@ -1,59 +1,54 @@
 import mysql.connector as mysql
 from mysql.connector import InterfaceError
 
+
+
+try:
+    db = mysql.connect(host="localhost", user="root", password="", database="bank")
+    command_handler = db.cursor(buffered=True)
+    print("Data Base connected".center(50))
+except InterfaceError as err:
+    print(f"Couldn't Connected Database server")
+else:
+    print("Successfully Connected ".center(50))
+
+# class User:
+#     print("")
+#     def __init__(self, name, age, gender):
+#         self.name = name
+#         self.age = age
+#         self.gender = gender
 #
-# class Database:
-#     try:
-#         db = mysql.connect(host="localhost", user="root", password="", database="bank")
-#         command_handler = db.cursor(buffered=True)
-#         print("Data Base connected".center(50))
-#     except InterfaceError as err:
-#         print(f"Couldn't Connected Database server")
-#     else:
-#         print("Successfully Connected ".center(50))
-
-db = mysql.connect(host="localhost", user="root", password="", database="bank")
-command_handler = db.cursor(buffered=True)
-
-
-class User:
-    print("")
-
-    def __init__(self, name, age, gender):
-        self.name = name
-        self.age = age
-        self.gender = gender
-
-    def show_details(self):
-        print("Persnal details")
-        print("")
-        print("Name  : ", self.name)
-        print("Age    : ", self.age)
-        print("Gender : ", self.gender)
-
-
-class Bank(User):
-    def __init__(self, name, age, gender):
-        super().__init__(name, age, gender)
-        self.balance = 0
-
-    def deposit(self, amount):
-        self.amount = amount
-        self.balance = self.balance + self.amount
-        print("Balance Updated : $", self.balance)
-
-    def withdraw(self, amount):
-        self.amount = amount
-        if self.amount > self.balance:
-            print(f"Insufficient fund | Now balance is {self.balance}")
-        else:
-            self.balance = self.balance - self.amount
-            print(f"Account balance is update {self.balance}")
-
-    def view_balance(self):
-        self.show_details()
-        print("Balance : $", self.balance)
-
+#     def show_details(self):
+#         print("Persnal details")
+#         print("")
+#         print("Name  : ", self.name)
+#         print("Age    : ", self.age)
+#         print("Gender : ", self.gender)
+#
+#
+# class Bank(User):
+#     def __init__(self, name, age, gender):
+#         super().__init__(name, age, gender)
+#         self.balance = 0
+#
+#     def deposit(self, amount):
+#         self.amount = amount
+#         self.balance = self.balance + self.amount
+#         print("Balance Updated : $", self.balance)
+#
+#     def withdraw(self, amount):
+#         self.amount = amount
+#         if self.amount > self.balance:
+#             print(f"Insufficient fund | Now balance is {self.balance}")
+#         else:
+#             self.balance = self.balance - self.amount
+#             print(f"Account balance is update {self.balance}")
+#
+#     def view_balance(self):
+#         self.show_details()
+#         print("Balance : $", self.balance)
+#
 
 class Working_process:
     def admin_option(self):
@@ -86,8 +81,8 @@ class Working_process:
 
                 acc_number = input(str("account number : "))
                 name = input(str("User name : "))
-
                 query_vals = (acc_number, name)
+
                 command_handler.execute("DELETE FROM bank_details WHERE acc_number = %s AND name = %s ", query_vals)
                 db.commit()
                 if command_handler.rowcount < 1:
@@ -97,9 +92,46 @@ class Working_process:
 
             elif user_option == "3":
                 break
-
             else:
                 print("invalid option crossed")
+
+
+    def user_option(self,name):
+        while True:
+            print("")
+            print(f"Welcome Bank user {name}")
+            print("")
+
+            print("1. Withdraw ")
+            print("2. Balance Check ")
+            print("3. Deposit ")
+            print("4. Logout ")
+
+            user_option = input(str("Option : \n")).lower()
+
+
+            if user_option == "1":
+                print("Withdraw Portal")
+                # withdraw_amount = input(str("Amount : \n"))
+                query_vals = name
+                command_handler.execute("SELECT amount FROM bank_details WHERE name = %s ",query_vals)
+
+
+
+            elif user_option == "2":
+                print("Balance Check")
+
+            elif user_option == "3":
+                print("Deposit")
+
+            elif user_option == "4":
+                break
+            else:
+                print("Not a valid Option chosed")
+
+
+
+
 
 
 class Authentication:
@@ -119,7 +151,19 @@ class Authentication:
             print(f"User Name {username} & Password {password} not valid ".center(20))
 
     def user_auth(self):
-        print("Welcome Bank user")
+        print("")
+        print("User Login :".center(50))
+        name = input(str("Enter Bank user Name  : \n")).lower()
+        password = input(str("Enter Bank User Password : \n")).lower()
+        query_vals = (name,password)
+        command_handler.execute("SELECT * FROM bank_details WHERE name = %s AND password = %s ",query_vals)
+
+        if command_handler.rowcount <= 0:
+            print("Log in not recognized ")
+        else:
+            user = Working_process()
+            user.user_option(name)
+
 
 
 class Main:
@@ -141,5 +185,4 @@ class Main:
 
 
 if __name__ == "__main__":
-    Database()
     Main()
